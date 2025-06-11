@@ -1,5 +1,5 @@
 import scanpy as sc
-import resolutiontree as rt
+import src as rt
 
 print("Loading PBMC dataset...")
 adata = sc.datasets.pbmc3k()

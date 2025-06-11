@@ -17,7 +17,10 @@ sc.tl.umap(adata)
 
 resolutions = [0.0, 0.2, 0.5, 1.0, 1.5, 2.0]
 
-adata_new = cluster_resolution_finder(adata,
+adata_discovery = adata.copy()
+
+# Perform hierarchical clustering with different resolutions
+cluster_resolution_finder(adata_discovery,
                                       resolutions=resolutions,
                                       n_top_genes=3, 
                                       min_cells=2,
@@ -25,7 +28,7 @@ adata_new = cluster_resolution_finder(adata,
                                       inplace=False
                                      )
 
-cluster_decision_tree(adata_new, resolutions=resolutions, 
+cluster_decision_tree(adata_discovery, resolutions=resolutions, 
                       output_settings = {
                           "output_path": "examples/expected.png",
                           "draw": False,

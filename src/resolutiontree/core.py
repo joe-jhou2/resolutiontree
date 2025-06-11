@@ -579,6 +579,9 @@ class ClusterTreePlotter:
         node_colors = self._assign_node_colors(
             data, prefix, self.resolutions, settings["node_color"], color_schemes
         )
+
+        plt.ioff() # Disable interactive mode
+
         # Step 2: Set up the plot figure and axis
         self.fig = plt.figure(figsize=settings["figsize"], dpi=settings["dpi"])
         self.ax = self.fig.add_subplot(111)
@@ -656,6 +659,8 @@ class ClusterTreePlotter:
             plt.savefig(settings["output_path"], bbox_inches="tight")
         if settings["draw"]:
             plt.show()
+            
+        plt.ion()
 
     def _get_draw_settings(self) -> dict:
         """Retrieve settings for drawing the cluster tree."""

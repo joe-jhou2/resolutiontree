@@ -288,8 +288,8 @@ def cluster_resolution_finder(
             msg = f"Leiden clustering failed at resolution {resolution}: {e}"
             raise RuntimeError(msg) from None
 
-    if not inplace:
-        adata = adata.copy()
+    # if not inplace:
+    # adata = adata.copy()
 
     # Find cluster-specific genes
     top_genes_dict = find_cluster_specific_genes(
@@ -319,11 +319,11 @@ def cluster_resolution_finder(
         raise RuntimeError(msg) from None
 
     # Store the results in adata.uns
-    # adata.uns["cluster_resolution_top_genes"] = top_genes_dict
-    adata.uns["cluster_resolution_top_genes"] = _convert_tuple_keys(top_genes_dict)
+    adata.uns["cluster_resolution_top_genes"] = top_genes_dict
+    # adata.uns["cluster_resolution_top_genes"] = _convert_tuple_keys(top_genes_dict)
     adata.uns["cluster_resolution_cluster_data"] = cluster_data
 
-    return adata
+    # return adata
 
 def _validate_cluster_resolution_inputs(
     adata: AnnData,
