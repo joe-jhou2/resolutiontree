@@ -192,7 +192,6 @@ def cluster_resolution_finder(
     deg_mode: Literal["within_parent", "per_resolution"] = "within_parent",
     flavor: Literal["igraph"] = "igraph",
     n_iterations: int = 2,
-    inplace: bool = False,
     verbose: bool = False,
 ) -> None:
     """
@@ -287,9 +286,6 @@ def cluster_resolution_finder(
         except RuntimeError as e:
             msg = f"Leiden clustering failed at resolution {resolution}: {e}"
             raise RuntimeError(msg) from None
-
-    # if not inplace:
-    # adata = adata.copy()
 
     # Find cluster-specific genes
     top_genes_dict = find_cluster_specific_genes(

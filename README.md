@@ -67,14 +67,16 @@ sc.tl.umap(adata)
 # Define resolutions to explore
 resolutions = [0.0, 0.2, 0.5, 1.0, 1.5, 2.0]
 
+# If you don't want to modify the original AnnData object, make a copy first
+adata_new = adata.copy()
+
 # Step 1: Find optimal resolution with DEG analysis
-adata_new = rt.cluster_resolution_finder(adata,
-                                         resolutions=resolutions,
-                                         n_top_genes=3,
-                                         min_cells=2,
-                                         deg_mode="within_parent",
-                                         inplace=False
-                                         )
+rt.cluster_resolution_finder(adata_new,
+                             resolutions=resolutions,
+                             n_top_genes=3,
+                             min_cells=2,
+                             deg_mode="within_parent"
+                             )
 
 # Step 2: Visualize the hierarchical clustering tree
 rt.cluster_decision_tree(adata_new, resolutions=resolutions, 
