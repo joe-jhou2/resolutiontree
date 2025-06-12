@@ -33,7 +33,7 @@ ResolutionTree provides:
 ### From GitHub Release (Recommended)
 
 ```bash
-pip install resolutiontree
+pip install resolutiontree==0.1.0a1
 ```
 
 ### From Source
