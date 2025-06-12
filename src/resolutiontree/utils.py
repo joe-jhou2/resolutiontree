@@ -255,71 +255,75 @@ def cluster_resolution_finder(
     import io
 
     from scanpy.tools import leiden
+    import warnings
+    from anndata._core.views import ImplicitModificationWarning
 
-    # Suppress prints if pytest is running
-    if "pytest" in sys.modules:
-        sys.stdout = io.StringIO()
 
-    _validate_cluster_resolution_inputs(adata, resolutions, method, flavor)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=ImplicitModificationWarning)
 
-    # Run Leiden clustering
-    for resolution in resolutions:
-        res_key = f"{prefix}{resolution}"
+        # Suppress prints if pytest is running
+        if "pytest" in sys.modules:
+            sys.stdout = io.StringIO()
+
+        _validate_cluster_resolution_inputs(adata, resolutions, method, flavor)
+
+        # Run Leiden clustering
+        for resolution in resolutions:
+            res_key = f"{prefix}{resolution}"
+            try:
+                leiden(
+                    adata,
+                    resolution=resolution,
+                    flavor="igraph",
+                    n_iterations=n_iterations,
+                    key_added=res_key,
+                )
+                if "pytest" not in sys.modules and not hasattr(
+                    sys, "_called_from_test"
+                ):  # Suppress print in tests
+                    print(f"Completed Leiden clustering for resolution {resolution}")
+            except ValueError as e:
+                msg = f"Leiden clustering failed at resolution {resolution} due to invalid value: {e}"
+                raise RuntimeError(msg) from None
+            except TypeError as e:
+                msg = f"Leiden clustering failed at resolution {resolution} due to incorrect type: {e}"
+                raise RuntimeError(msg) from None
+            except RuntimeError as e:
+                msg = f"Leiden clustering failed at resolution {resolution}: {e}"
+                raise RuntimeError(msg) from None
+
+        # Find cluster-specific genes
+        top_genes_dict = find_cluster_specific_genes(
+            adata=adata,
+            resolutions=resolutions,
+            prefix=prefix,
+            method=method,
+            n_top_genes=n_top_genes,
+            min_cells=min_cells,
+            deg_mode=deg_mode,
+            verbose=verbose,
+        )
+
+        # Create DataFrame for clusterDecisionTree
         try:
-            leiden(
-                adata,
-                resolution=resolution,
-                flavor="igraph",
-                n_iterations=n_iterations,
-                key_added=res_key,
+            cluster_data = pd.DataFrame(
+                {f"{prefix}{r}": adata.obs[f"{prefix}{r}"] for r in resolutions}
             )
-            if "pytest" not in sys.modules and not hasattr(
-                sys, "_called_from_test"
-            ):  # Suppress print in tests
-                print(f"Completed Leiden clustering for resolution {resolution}")
+        except KeyError as e:
+            msg = f"Failed to create cluster_data DataFrame: missing column {e}"
+            raise RuntimeError(msg) from None
         except ValueError as e:
-            msg = f"Leiden clustering failed at resolution {resolution} due to invalid value: {e}"
+            msg = f"Failed to create cluster_data DataFrame due to invalid value: {e}"
             raise RuntimeError(msg) from None
         except TypeError as e:
-            msg = f"Leiden clustering failed at resolution {resolution} due to incorrect type: {e}"
-            raise RuntimeError(msg) from None
-        except RuntimeError as e:
-            msg = f"Leiden clustering failed at resolution {resolution}: {e}"
+            msg = f"Failed to create cluster_data DataFrame due to incorrect type: {e}"
             raise RuntimeError(msg) from None
 
-    # Find cluster-specific genes
-    top_genes_dict = find_cluster_specific_genes(
-        adata=adata,
-        resolutions=resolutions,
-        prefix=prefix,
-        method=method,
-        n_top_genes=n_top_genes,
-        min_cells=min_cells,
-        deg_mode=deg_mode,
-        verbose=verbose,
-    )
-
-    # Create DataFrame for clusterDecisionTree
-    try:
-        cluster_data = pd.DataFrame(
-            {f"{prefix}{r}": adata.obs[f"{prefix}{r}"] for r in resolutions}
-        )
-    except KeyError as e:
-        msg = f"Failed to create cluster_data DataFrame: missing column {e}"
-        raise RuntimeError(msg) from None
-    except ValueError as e:
-        msg = f"Failed to create cluster_data DataFrame due to invalid value: {e}"
-        raise RuntimeError(msg) from None
-    except TypeError as e:
-        msg = f"Failed to create cluster_data DataFrame due to incorrect type: {e}"
-        raise RuntimeError(msg) from None
-
-    # Store the results in adata.uns
-    adata.uns["cluster_resolution_top_genes"] = top_genes_dict
-    # adata.uns["cluster_resolution_top_genes"] = _convert_tuple_keys(top_genes_dict)
-    adata.uns["cluster_resolution_cluster_data"] = cluster_data
-
-    # return adata
+        # Store the results in adata.uns
+        adata.uns["cluster_resolution_top_genes"] = top_genes_dict
+        adata.uns["cluster_resolution_cluster_data"] = cluster_data
+        # return adata
 
 def _validate_cluster_resolution_inputs(
     adata: AnnData,

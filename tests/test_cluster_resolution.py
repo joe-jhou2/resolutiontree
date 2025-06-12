@@ -9,7 +9,7 @@ import re
 import pandas as pd
 import pytest
 import scanpy as sc
-from src import cluster_resolution_finder
+from src.resolutiontree import cluster_resolution_finder
 from testing.scanpy._helpers.data import pbmc68k_reduced
 
 
@@ -28,7 +28,7 @@ def test_cluster_resolution_finder_basic(adata_for_test):
     """Test that cluster_resolution_finder runs without errors and modifies adata."""
     adata = adata_for_test.copy()  # Create a copy to avoid modifying the fixture
     resolutions = [0.1, 0.5]
-    result = cluster_resolution_finder(
+    cluster_resolution_finder(
         adata,
         resolutions,
         prefix="leiden_res_",
@@ -42,24 +42,23 @@ def test_cluster_resolution_finder_basic(adata_for_test):
 
     # Check that clustering columns were added to adata.obs
     for res in resolutions:
-        assert f"leiden_res_{res}" in result.obs
+        assert f"leiden_res_{res}" in adata.obs
 
     # Check that top_genes_dict was added to adata.uns
-    assert "cluster_resolution_top_genes" in result.uns
-    top_genes_dict = result.uns["cluster_resolution_top_genes"]
+    assert "cluster_resolution_top_genes" in adata.uns
+    top_genes_dict = adata.uns["cluster_resolution_top_genes"]
     assert isinstance(top_genes_dict, dict)
     assert len(top_genes_dict) > 0
 
-    for k, genes in top_genes_dict.items():
-        parent, child = k.split("_", 1)  # Split the combined key back into tuple
+    for (parent, child), genes in top_genes_dict.items():
         assert isinstance(parent, str)
         assert isinstance(child, str)
         assert isinstance(genes, list)
         assert all(isinstance(g, str) for g in genes)
 
     # Check that cluster_data was added to adata.uns
-    assert "cluster_resolution_cluster_data" in result.uns
-    cluster_data = result.uns["cluster_resolution_cluster_data"]
+    assert "cluster_resolution_cluster_data" in adata.uns
+    cluster_data = adata.uns["cluster_resolution_cluster_data"]
     assert isinstance(cluster_data, pd.DataFrame)
     for res in resolutions:
         assert f"leiden_res_{res}" in cluster_data.columns
@@ -145,13 +144,13 @@ def test_cluster_resolution_finder_n_top_genes(adata_for_test, n_top_genes):
     """Test that n_top_genes bounds the number of genes stored in adata.uns."""
     adata = adata_for_test.copy()
     resolutions = [0.1, 0.5]
-    result = cluster_resolution_finder(
+    cluster_resolution_finder(
         adata,
         resolutions,
         n_top_genes=n_top_genes,
     )
 
     # Check the number of genes in adata.uns["cluster_resolution_top_genes"]
-    top_genes_dict = result.uns["cluster_resolution_top_genes"]
+    top_genes_dict = adata.uns["cluster_resolution_top_genes"]
     for genes in top_genes_dict.values():
         assert len(genes) <= n_top_genes

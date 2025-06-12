@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import networkx as nx
 import pytest
 from scanpy.tools import leiden
-from src import cluster_decision_tree, cluster_resolution_finder
+from src.resolutiontree import cluster_decision_tree, cluster_resolution_finder
 import scanpy as sc
 from testing.scanpy._helpers.data import pbmc68k_reduced
 
@@ -26,7 +26,7 @@ def adata_with_clusters(adata_for_test):
     """Fixture providing clustering data and top_genes_dict for cluster_decision_tree."""
     adata = adata_for_test.copy()
     resolutions = [0.0, 0.2, 0.5, 1.0, 1.5, 2.0]
-    adata = cluster_resolution_finder(
+    cluster_resolution_finder(
         adata,
         resolutions,
         prefix="leiden_res_",

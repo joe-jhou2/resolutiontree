@@ -1,9 +1,8 @@
 import scanpy as sc
-import src as rt
+import resolutiontree as rt
 
 print("Loading PBMC dataset...")
 adata = sc.datasets.pbmc3k()
-
 
 print("Running preprocessing...")
 sc.pp.normalize_total(adata, inplace=True)
@@ -13,20 +12,18 @@ sc.pp.neighbors(adata)
 sc.tl.umap(adata)
 
 print("Testing cluster_resolution_finder...")
-resolutions = [0.0, 0.2, 0.5, 1.0]
 resolutions = [0.0, 0.2, 0.5, 1.0, 1.5, 2.0]
 
-adata_new = rt.cluster_resolution_finder(adata,
-                                         resolutions=resolutions,
-                                         n_top_genes=3,
-                                         min_cells=2,
-                                         deg_mode="within_parent",
-                                         inplace=False
-                                         )
+rt.cluster_resolution_finder(adata,
+                             resolutions=resolutions,
+                             n_top_genes=3,
+                             min_cells=2,
+                             deg_mode="within_parent"
+                            )
 
-rt.cluster_decision_tree(adata_new, resolutions=resolutions, 
+rt.cluster_decision_tree(adata, resolutions=resolutions, 
                         output_settings = {
-                            "output_path": "examples/test_pypi_pbmc3k.png",
+                            "output_path": "tests/test_pypi_pbmc3k.png",
                             "draw": False,
                             "figsize": (12, 6),
                             "dpi": 300

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "resolutiontree"
-version = "0.1.1"
+version = "0.1.0a1"
 description = "Systematic exploration of clustering resolutions in single-cell analysis"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -23,11 +23,11 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 
 [project.urls]
 Homepage = "https://github.com/joe-jhou2/resolutiontree"
-Documentation = "https://resolutiontree.readthedocs.io/"
 Repository = "https://github.com/joe-jhou2/resolutiontree"
 "Bug Tracker" = "https://github.com/joe-jhou2/resolutiontree/issues"
 

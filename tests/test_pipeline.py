@@ -3,7 +3,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 import scanpy as sc
-from src import cluster_resolution_finder, cluster_decision_tree
+from src.resolutiontree import cluster_resolution_finder, cluster_decision_tree
 
 # Load the dataset
 adata = sc.datasets.pbmc3k()
@@ -21,18 +21,17 @@ adata_discovery = adata.copy()
 
 # Perform hierarchical clustering with different resolutions
 cluster_resolution_finder(adata_discovery,
-                                      resolutions=resolutions,
-                                      n_top_genes=3, 
-                                      min_cells=2,
-                                      deg_mode="within_parent",
-                                      inplace=False
-                                     )
+                          resolutions=resolutions,
+                          n_top_genes=3, 
+                          min_cells=2,
+                          deg_mode="within_parent"
+                          )
 
 cluster_decision_tree(adata_discovery, resolutions=resolutions, 
                       output_settings = {
-                          "output_path": "examples/expected.png",
+                          "output_path": "tests/expected.png",
                           "draw": False,
-                          "figsize": (12, 6),
+                          "figsize": (12, 8),
                           "dpi": 300
                           },
                       node_style = {

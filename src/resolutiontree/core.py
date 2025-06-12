@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from typing import TYPE_CHECKING, TypedDict, cast
-
+import sys
 import igraph as ig
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
@@ -564,6 +564,10 @@ class ClusterTreePlotter:
         data = settings["data"]
         prefix = settings["prefix"]
 
+        # in_jupyter = 'ipykernel' in sys.modules
+        # if in_jupyter:
+        #     print("🔄 Running latest code from editable install")
+
         # Step 1: Compute Cluster Sizes, Node Sizes, and Node Colors
         cluster_sizes = self._compute_cluster_sizes(data, prefix, self.resolutions)
         node_sizes = self._scale_node_sizes(
@@ -579,16 +583,18 @@ class ClusterTreePlotter:
         node_colors = self._assign_node_colors(
             data, prefix, self.resolutions, settings["node_color"], color_schemes
         )
-
-        plt.ioff() # Disable interactive mode
-
         # Step 2: Set up the plot figure and axis
+        plt.close('all')
+        plt.ioff()
+
         self.fig = plt.figure(figsize=settings["figsize"], dpi=settings["dpi"])
         self.ax = self.fig.add_subplot(111)
+
         # Step 3: Compute Edge Weights, Edge Colors
         edges, weights, edge_colors = self._compute_edge_weights_colors(
             self.G, settings["edge_threshold"], settings["edge_color"], node_colors
         )
+
         # Step 4: Draw Nodes and Node Labels
         node_styles = {"colors": node_colors, "sizes": node_sizes}
         node_labels, gene_labels = self._draw_nodes_and_labels(
@@ -610,6 +616,7 @@ class ClusterTreePlotter:
             font_size=int(settings["node_label_fontsize"]),
             font_color="black",
         )
+
         # Step 5: Draw Gene Labels
         gene_label_bottoms = {}
         if settings["show_gene_labels"] and gene_labels:
@@ -622,6 +629,7 @@ class ClusterTreePlotter:
                 offset=settings["gene_label_offset"],
                 fontsize=settings["gene_label_fontsize"],
             )
+
         # Step 6: Build and Draw Edge Labels
         edge_labels = self._build_edge_labels(
             self.G, settings["edge_threshold"], settings["edge_label_threshold"]
@@ -642,6 +650,7 @@ class ClusterTreePlotter:
             edge_labels=edge_labels,
             edge_label_style=edge_label_style,
         )
+
         # Step 7: Draw Level Labels
         self._draw_level_labels(
             resolutions=self.resolutions,
@@ -651,15 +660,17 @@ class ClusterTreePlotter:
             level_label_offset=settings["level_label_offset"],
             level_label_fontsize=settings["level_label_fontsize"],
         )
+
         # Step 8: Final Plot Settings
         self.ax.set_title(settings["title"], fontsize=settings["title_fontsize"])
         self.ax.axis("off")
+
         # Save or show the plot
         if settings["output_path"]:
             plt.savefig(settings["output_path"], bbox_inches="tight")
         if settings["draw"]:
+            self.fig.canvas.draw()
             plt.show()
-            
         plt.ion()
 
     def _get_draw_settings(self) -> dict:
@@ -879,7 +890,7 @@ class ClusterTreePlotter:
                     pos,
                     nodelist=[node],
                     node_size=size,
-                    node_color=color,
+                    node_color=[color],
                     edgecolors="none",
                 )
                 node_labels[node] = str(cluster)
