@@ -1,0 +1,60 @@
+Metadata-Version: 2.4
+Name: session-info2
+Version: 0.1.2
+Summary: Print versions of imported packages.
+Project-URL: Documentation, https://github.com/flying-sheep/session-info2#readme
+Project-URL: Issues, https://github.com/flying-sheep/session-info2/issues
+Project-URL: Source, https://github.com/flying-sheep/session-info2
+Author-email: "Philipp A." <flying-sheep@web.de>
+License-Expression: MPL-2.0
+License-File: LICENSE.rst
+Keywords: jupyter,session-info
+Classifier: Development Status :: 4 - Beta
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Typing :: Typed
+Requires-Python: >=3.10
+Provides-Extra: docs
+Requires-Dist: furo; extra == 'docs'
+Requires-Dist: hatch; extra == 'docs'
+Requires-Dist: ipywidgets; extra == 'docs'
+Requires-Dist: myst-nb; extra == 'docs'
+Requires-Dist: numpy; extra == 'docs'
+Requires-Dist: session-info; extra == 'docs'
+Requires-Dist: sphinx; extra == 'docs'
+Requires-Dist: sphinx-autodoc-typehints; extra == 'docs'
+Requires-Dist: sphinx-codeautolink; extra == 'docs'
+Provides-Extra: jupyter
+Requires-Dist: ipywidgets; extra == 'jupyter'
+Provides-Extra: notebook
+Requires-Dist: ipywidgets; extra == 'notebook'
+Requires-Dist: numpy; extra == 'notebook'
+Requires-Dist: session-info; extra == 'notebook'
+Provides-Extra: test
+Requires-Dist: coverage[toml]>=6.5; extra == 'test'
+Requires-Dist: ipykernel; extra == 'test'
+Requires-Dist: jupyter-client; extra == 'test'
+Requires-Dist: pytest; extra == 'test'
+Requires-Dist: pytest-asyncio; extra == 'test'
+Requires-Dist: pytest-md; extra == 'test'
+Requires-Dist: pytest-subprocess; extra == 'test'
+Requires-Dist: testing-common-database; extra == 'test'
+Description-Content-Type: text/markdown
+
+# session-info2
+
+[![PyPI - Version](https://img.shields.io/pypi/v/session-info2.svg)](https://pypi.org/project/session-info2)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/session-info2.svg)](https://pypi.org/project/session-info2)
+[![Docs](https://readthedocs.org/projects/session-info2/badge/)](https://session-info2.readthedocs.io/)
+
+## Installation
+
+```console
+pip install session-info2
+```
