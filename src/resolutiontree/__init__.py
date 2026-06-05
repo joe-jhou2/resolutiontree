@@ -2,7 +2,7 @@
 ResolutionTree: Systematic exploration of clustering resolutions in single-cell analysis
 """
 
-__version__ = "0.1.0a1"
+__version__ = "0.2"
 __author__ = "Joe Hou"
 
 from .utils import cluster_resolution_finder

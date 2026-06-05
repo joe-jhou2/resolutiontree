@@ -1,35 +1,29 @@
 import sys
 import os
+import spatialdata as sd
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 import scanpy as sc
 from src.resolutiontree import cluster_resolution_finder, cluster_decision_tree
 
 # Load the dataset
-adata = sc.datasets.pbmc3k()
+adata = sd.read_zarr("data/CF_8wph_processed.zarr")
+print(adata)
 
 # Perform standard preprocessing
-sc.pp.normalize_total(adata)
-sc.pp.log1p(adata)
-sc.pp.pca(adata)
-sc.pp.neighbors(adata)
-sc.tl.umap(adata)
-
 resolutions = [0.0, 0.2, 0.5, 1.0, 1.5, 2.0]
 
-adata_discovery = adata.copy()
-
 # Perform hierarchical clustering with different resolutions
-cluster_resolution_finder(adata_discovery,
+cluster_resolution_finder(adata,
                           resolutions=resolutions,
                           n_top_genes=3, 
                           min_cells=2,
                           deg_mode="within_parent"
                           )
 
-cluster_decision_tree(adata_discovery, resolutions=resolutions, 
+cluster_decision_tree(adata, resolutions=resolutions, 
                       output_settings = {
-                          "output_path": "tests/expected.png",
+                          "output_path": "tests/results/test_pipeline_xenium.png",
                           "draw": False,
                           "figsize": (12, 8),
                           "dpi": 300
@@ -71,3 +65,5 @@ cluster_decision_tree(adata_discovery, resolutions=resolutions,
                           "edge_threshold": 0.05
                         }
                     )
+
+# print(adata['table'].uns["cluster_resolution_top_genes"])

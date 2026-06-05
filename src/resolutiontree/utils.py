@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from typing import Literal
 from anndata import AnnData
 from scanpy.tools._rank_genes_groups import rank_genes_groups
+import spatialdata as sd
 
 def find_cluster_specific_genes(
     adata: AnnData,
@@ -181,8 +182,61 @@ def find_per_resolution_degs(
     return top_genes_dict
 
 
+""" def _extract_adata(obj):
+    import spatialdata as sd
+    from anndata import AnnData
+
+    if isinstance(obj, AnnData):
+        return obj
+
+    if isinstance(obj, sd.SpatialData):
+        if "table" not in obj.tables:
+            raise ValueError("SpatialData object has no 'table' in .tables")
+        return obj.tables["table"]
+
+    raise TypeError(
+        "Input must be AnnData or SpatialData (with .tables['table'])"
+    )
+ """
+
+
+def extract_adata(obj) -> AnnData:
+    """
+    Accepts either AnnData or SpatialData and returns AnnData.
+    """
+    if isinstance(obj, AnnData):
+        return obj
+
+    if isinstance(obj, sd.SpatialData):
+        if len(obj.tables) == 0:
+            raise ValueError("SpatialData has no tables")
+
+        # default convention: first table is main expression matrix
+        return obj.tables.get("table", next(iter(obj.tables.values())))
+
+    raise TypeError("Input must be AnnData or SpatialData")
+
+def write_results(obj, adata: AnnData, results: dict, prefix: str = None):
+    """
+    Write results back to either AnnData or SpatialData.
+    """
+
+    if isinstance(obj, AnnData):
+        obj.uns.update(results)
+        return obj
+
+    if isinstance(obj, sd.SpatialData):
+        table = obj.tables.get("table", None)
+        if table is None:
+            raise ValueError("SpatialData has no 'table'")
+
+        table.uns.update(results)
+        return obj
+
+    raise TypeError("Unsupported object type")
+
 def cluster_resolution_finder(
-    adata: AnnData,
+    data,
     resolutions: list[float],
     *,
     prefix: str = "leiden_res_",
@@ -258,6 +312,7 @@ def cluster_resolution_finder(
     import warnings
     from anndata._core.views import ImplicitModificationWarning
 
+    adata = extract_adata(data)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=ImplicitModificationWarning)
@@ -321,9 +376,17 @@ def cluster_resolution_finder(
             raise RuntimeError(msg) from None
 
         # Store the results in adata.uns
-        adata.uns["cluster_resolution_top_genes"] = top_genes_dict
-        adata.uns["cluster_resolution_cluster_data"] = cluster_data
+        # adata.uns["cluster_resolution_top_genes"] = top_genes_dict
+        # adata.uns["cluster_resolution_cluster_data"] = cluster_data
         # return adata
+
+        results = {
+            "cluster_resolution_top_genes": top_genes_dict,
+            "cluster_resolution_cluster_data": cluster_data,
+        }
+        data = write_results(data, adata, results)
+        return data
+    
 
 def _validate_cluster_resolution_inputs(
     adata: AnnData,

@@ -23,7 +23,7 @@ rt.cluster_resolution_finder(adata,
 
 rt.cluster_decision_tree(adata, resolutions=resolutions, 
                         output_settings = {
-                            "output_path": "tests/test_pypi_pbmc3k.png",
+                            "output_path": "tests/results/test_pypi_pbmc3k.png",
                             "draw": False,
                             "figsize": (12, 6),
                             "dpi": 300

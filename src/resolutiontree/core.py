@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from typing import TYPE_CHECKING, TypedDict, cast
-import sys
+# import sys
 import igraph as ig
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 import networkx as nx
 import pandas as pd
 from anndata import AnnData
+import spatialdata as sd
 
 
 class OutputSettings(TypedDict):
@@ -112,8 +113,17 @@ class ClusterTreePlotter:
         clustering_settings
             Clustering settings (prefix).
         """
+        if isinstance(adata, sd.SpatialData):
+            if "table" not in adata.tables:
+                raise ValueError("SpatialData must contain 'table'")
+            adata = adata.tables["table"]
+
+        if not isinstance(adata, AnnData):
+            raise TypeError("ClusterTreePlotter requires AnnData")
+        
         self.adata = adata
         self.resolutions = resolutions
+
         self.output_settings = self._merge_with_default(
             output_settings, self.default_output_settings()
         )
@@ -1248,6 +1258,14 @@ class ClusterTreePlotter:
         Directed graph representing the hierarchical clustering.
 
         """
+        if isinstance(adata, sd.SpatialData):
+            if "table" not in adata.tables:
+                raise ValueError("SpatialData must contain 'table'")
+            adata = adata.tables["table"]
+
+        if not isinstance(adata, AnnData):
+            raise TypeError("Expected AnnData after extraction")
+        
         # Run all validations
         ClusterTreePlotter._validate_parameters(output_settings, node_style, edge_style)
         ClusterTreePlotter._validate_clustering_data(
